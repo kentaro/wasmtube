@@ -3,16 +3,28 @@ defmodule Wasmtube do
   Documentation for `Wasmtube`.
   """
 
-  @doc """
-  Hello world.
+  def from_binary(wasm_binary) do
+    Wasmtube.Bridge.new(binary: wasm_binary)
+  end
 
-  ## Examples
+  def from_file(wasm_file) do
+    Wasmtube.Bridge.new(file: wasm_file)
+  end
 
-      iex> Wasmtube.hello()
-      :world
+  def index(bridge, index) do
+    %Wasmtube.Bridge{
+      bridge | index: index
+    }
+  end
 
-  """
-  def hello do
-    :world
+  def buffer_size(bridge, buffer_size) do
+    %Wasmtube.Bridge{
+      bridge | buffer_size: buffer_size
+    }
+  end
+
+  def call_function(bridge, function, arg) do
+    bridge
+    |> Wasmtube.Bridge.call_function(function, arg)
   end
 end
