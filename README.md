@@ -1,6 +1,6 @@
 # Wasmtube
 
-**TODO: Add description**
+Wasmtube is a bridging library that allows us to communicate between Elixir and Wasm using JSON-encoded values.
 
 ## Installation
 
@@ -15,7 +15,20 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/wasmtube>.
+## Usage
 
+```elixir
+Wasmtube.from_file("hello_world.wasm")
+|> Wasmtube.call_function("hello", %{arg: "World"})
+```
+
+`Wasmtube.call_function` takes 2 arguments:
+
+- Function name that is same as one in Wasm code.
+- Arguments that are represented by `Map` in Elixir
+
+When you call a function defined in Wasm from Elixir, arguments passed into the function and values returned from it are conveyed via `WebAssembly.Memory`.
+
+## Author
+
+Kentaro Kuribayashi
