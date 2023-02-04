@@ -1,6 +1,6 @@
 # Wasmtube
 
-Wasmtube is a bridging library that allows us to communicate between Elixir and Wasm using JSON-encoded values.
+Wasmtube is a bridging library that allows you to communicate between Elixir and Wasm via JSON-encoded structured values.
 
 ## Installation
 
