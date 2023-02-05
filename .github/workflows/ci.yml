@@ -19,6 +19,8 @@ jobs:
           toolchain: stable
       - run: cargo build
         working-directory: ./test/wasm_test
+      - run: wasm-pack build
+        working-directory: ./test/wasm_test
 
       # build Elixir project
       - uses: erlef/setup-beam@v1
