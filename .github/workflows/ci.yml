@@ -1,4 +1,4 @@
-on: [push]
+on: [push, pull_request]
 
 name: CI
 
@@ -17,11 +17,8 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - uses: actions-rs/cargo@v1
-        with:
-          working-directory: test/wasm_test
-          command: build
-          args: --release --all-features
+      - run: cargo build
+        working-directory: ./test/wasm_test
 
       # build Elixir project
       - uses: erlef/setup-beam@v1
