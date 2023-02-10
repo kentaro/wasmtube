@@ -17,8 +17,6 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - run: cargo build
-        working-directory: ./test/wasm_test
       - uses: jetli/wasm-pack-action@v0.4.0
         with:
           version: 'latest'

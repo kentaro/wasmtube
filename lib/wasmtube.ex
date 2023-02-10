@@ -13,13 +13,15 @@ defmodule Wasmtube do
 
   def index(bridge, index) do
     %Wasmtube.Bridge{
-      bridge | index: index
+      bridge
+      | index: index
     }
   end
 
   def buffer_size(bridge, buffer_size) do
     %Wasmtube.Bridge{
-      bridge | buffer_size: buffer_size
+      bridge
+      | buffer_size: buffer_size
     }
   end
 

@@ -3,6 +3,9 @@ defmodule Wasmtube.Bridge.Test do
   doctest Wasmtube
 
   @wasm_file "test/wasm_test/target/wasm32-unknown-unknown/release/wasm_test.wasm"
+  # This image is taken from:
+  # https://commons.wikimedia.org/wiki/File:So_happy_smiling_cat.jpg
+  @image_file "test/assets/cat.jpg"
 
   test "new/1 with binary" do
     bridge = Wasmtube.Bridge.new(binary: File.read!(@wasm_file))
@@ -14,21 +17,36 @@ defmodule Wasmtube.Bridge.Test do
     assert %Wasmtube.Bridge{} = bridge
   end
 
-  test "call_function/3" do
+  test "call_function/3 with struct" do
     bridge = Wasmtube.Bridge.new(file: @wasm_file)
 
     result =
       bridge
       |> Wasmtube.Bridge.call_function(
         "echo",
-        %{
-          arg: "Hello World!"
+        struct: %{
+          args: "Hello World!"
         }
       )
 
     assert result == %{
-             "arg" => "Hello World!",
-             "buffer_size" => 1024
+             "args" => "Hello World!"
+           }
+  end
+
+  test "call_function/3 with binary" do
+    bridge = Wasmtube.Bridge.new(file: @wasm_file)
+
+    result =
+      bridge
+      |> Wasmtube.Bridge.call_function(
+        "image_size",
+        binary: File.read!(@image_file)
+      )
+
+    assert result == %{
+             "width" => 429,
+             "height" => 500
            }
   end
 
@@ -63,6 +81,6 @@ defmodule Wasmtube.Bridge.Test do
       |> String.split(<<0>>)
       |> List.first()
 
-      assert result == "Hello World!"
+    assert result == "Hello World!"
   end
 end

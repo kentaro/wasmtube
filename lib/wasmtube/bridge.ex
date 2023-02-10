@@ -4,7 +4,7 @@ defmodule Wasmtube.Bridge do
   @default_index 42
   @default_buffer_size 1024
 
-  def new([binary: wasm_binary]) when is_binary(wasm_binary) do
+  def new(binary: wasm_binary) when is_binary(wasm_binary) do
     {:ok, instance} =
       %{
         bytes: wasm_binary
@@ -23,21 +23,29 @@ defmodule Wasmtube.Bridge do
     }
   end
 
-  def new([file: wasm_file]) do
+  def new(file: wasm_file) do
     wasm_binary = File.read!(wasm_file)
     new(binary: wasm_binary)
   end
 
-  def call_function(bridge, function, args) when is_map(args) do
-    args = args |> Map.put(:buffer_size, bridge.buffer_size)
-    json = Jason.encode!(args)
-    bridge |> write_binary(json)
+  def call_function(bridge, function, binary: binary) when is_binary(binary) do
+    bridge |> call_function(function, binary)
+  end
 
-    {:ok, [pointer]} = Wasmex.call_function(
-      bridge.instance,
-      function,
-      [bridge.index, json |> String.length()]
-    )
+  def call_function(bridge, function, struct: struct) when is_map(struct) do
+    json = struct |> Jason.encode!()
+    bridge |> call_function(function, json)
+  end
+
+  def call_function(bridge, function, args) do
+    bridge |> write_binary(args)
+
+    {:ok, [pointer]} =
+      Wasmex.call_function(
+        bridge.instance,
+        function,
+        [bridge.index, args |> byte_size()]
+      )
 
     bridge
     |> read_binary(pointer)

@@ -39,14 +39,13 @@ defmodule Wasmtube.Test do
       Wasmtube.from_file(@wasm_file)
       |> Wasmtube.call_function(
         "echo",
-        %{
-          arg: "Hello World!"
+        struct: %{
+          args: "Hello World!"
         }
       )
 
     assert result == %{
-      "arg" => "Hello World!",
-      "buffer_size" => 1024,
-    }
+             "args" => "Hello World!"
+           }
   end
 end
