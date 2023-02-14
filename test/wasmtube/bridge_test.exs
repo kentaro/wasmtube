@@ -61,10 +61,8 @@ defmodule Wasmtube.Bridge.Test do
         bridge.store,
         bridge.memory,
         bridge.index,
-        bridge.buffer_size
+        12
       )
-      |> String.split(<<0>>)
-      |> List.first()
 
     assert result == "Hello World!"
   end
@@ -77,9 +75,7 @@ defmodule Wasmtube.Bridge.Test do
 
     result =
       bridge
-      |> Wasmtube.Bridge.read_binary(bridge.index)
-      |> String.split(<<0>>)
-      |> List.first()
+      |> Wasmtube.Bridge.read_binary(12)
 
     assert result == "Hello World!"
   end

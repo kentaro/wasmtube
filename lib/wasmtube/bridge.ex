@@ -1,8 +1,7 @@
 defmodule Wasmtube.Bridge do
-  defstruct [:instance, :store, :memory, :index, :buffer_size]
+  defstruct [:instance, :store, :memory, :index]
 
   @default_index 42
-  @default_buffer_size 1024
 
   def new(binary: wasm_binary) when is_binary(wasm_binary) do
     {:ok, instance} =
@@ -19,7 +18,6 @@ defmodule Wasmtube.Bridge do
       store: store,
       memory: memory,
       index: @default_index,
-      buffer_size: @default_buffer_size
     }
   end
 
@@ -40,7 +38,7 @@ defmodule Wasmtube.Bridge do
   def call_function(bridge, function, args) do
     bridge |> write_binary(args)
 
-    {:ok, [pointer]} =
+    {:ok, [data_size]} =
       Wasmex.call_function(
         bridge.instance,
         function,
@@ -48,10 +46,7 @@ defmodule Wasmtube.Bridge do
       )
 
     bridge
-    |> read_binary(pointer)
-    # TODO: This is a hack to remove the null byte at the end of the string
-    |> String.split(<<0>>)
-    |> List.first()
+    |> read_binary(data_size)
     |> Jason.decode!()
   end
 
@@ -64,12 +59,12 @@ defmodule Wasmtube.Bridge do
     )
   end
 
-  def read_binary(bridge, pointer) do
-    Wasmex.Memory.read_string(
+  def read_binary(bridge, data_size) do
+    Wasmex.Memory.read_binary(
       bridge.store,
       bridge.memory,
-      pointer,
-      bridge.buffer_size
+      bridge.index,
+      data_size
     )
   end
 end

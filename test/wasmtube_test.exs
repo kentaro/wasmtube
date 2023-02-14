@@ -24,16 +24,6 @@ defmodule Wasmtube.Test do
     assert bridge.index == index
   end
 
-  test "buffer_size/2" do
-    buffer_size = 2048
-
-    bridge =
-      Wasmtube.from_file(@wasm_file)
-      |> Wasmtube.buffer_size(buffer_size)
-
-    assert bridge.buffer_size == buffer_size
-  end
-
   test "call_function/3" do
     result =
       Wasmtube.from_file(@wasm_file)

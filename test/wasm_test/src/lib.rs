@@ -1,4 +1,5 @@
 use std::mem;
+use std::ptr;
 use std::slice;
 use std::str;
 
@@ -19,7 +20,7 @@ struct ImageInfo {
 }
 
 #[no_mangle]
-pub extern "C" fn echo(index: *const u8, length: usize) -> *const u8 {
+pub extern "C" fn echo(index: *const u8, length: usize) -> i32 {
     let slice = unsafe {
       slice::from_raw_parts(index, length)
     };
@@ -27,12 +28,20 @@ pub extern "C" fn echo(index: *const u8, length: usize) -> *const u8 {
       str::from_utf8(slice).unwrap()
     ).unwrap();
 
-    let json = serde_json::to_string(&args).unwrap();
-    json.as_ptr()
+    let out_addr = index as *mut u8;
+    let data_vec = serde_json::to_vec(&args).unwrap();
+    let data_size = data_vec.len();
+    for i in 0..data_size {
+      unsafe {
+        ptr::write(out_addr.offset(i.try_into().unwrap()), *data_vec.get(i).unwrap());
+      }
+    }
+
+    data_size as i32
 }
 
 #[no_mangle]
-pub extern "C" fn image_size(index: *const u8, length: usize) -> *const u8 {
+pub extern "C" fn image_size(index: *const u8, length: usize) -> i32 {
     let slice = unsafe {
       slice::from_raw_parts(index, length * mem::size_of::<u64>() as usize)
     };
@@ -43,6 +52,14 @@ pub extern "C" fn image_size(index: *const u8, length: usize) -> *const u8 {
         height: img.height(),
     };
 
-    let json = serde_json::to_string(&image_info).unwrap();
-    json.as_ptr()
+    let out_addr = index as *mut u8;
+    let data_vec = serde_json::to_vec(&image_info).unwrap();
+    let data_size = data_vec.len();
+    for i in 0..data_size {
+      unsafe {
+        ptr::write(out_addr.offset(i.try_into().unwrap()), *data_vec.get(i).unwrap());
+      }
+    }
+
+    data_size as i32
 }

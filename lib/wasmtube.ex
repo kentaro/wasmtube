@@ -18,13 +18,6 @@ defmodule Wasmtube do
     }
   end
 
-  def buffer_size(bridge, buffer_size) do
-    %Wasmtube.Bridge{
-      bridge
-      | buffer_size: buffer_size
-    }
-  end
-
   def call_function(bridge, function, arg) do
     bridge
     |> Wasmtube.Bridge.call_function(function, arg)
