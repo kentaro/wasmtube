@@ -26,23 +26,30 @@ defmodule Wasmtube.Bridge do
     new(binary: wasm_binary)
   end
 
-  def call_function(bridge, function, binary: binary) when is_binary(binary) do
-    bridge |> call_function(function, binary)
+  def call_function(bridge, function, [image: image, width: width, height: height]) when is_binary(image) do
+    bridge |> call_function(function, image, [width, height])
   end
 
-  def call_function(bridge, function, struct: struct) when is_map(struct) do
-    json = struct |> Jason.encode!()
-    bridge |> call_function(function, json)
+  def call_function(bridge, function, [data: data]) do
+    json = data |> Jason.encode!()
+    bridge |> call_function(function, json, [])
   end
 
-  def call_function(bridge, function, args) do
-    bridge |> write_binary(args)
+  def call_function(bridge, function, data, args) do
+    bridge |> write_binary(data)
+
+    func_arg = [
+      bridge.index,
+      data |> byte_size(),
+      args
+    ]
+    |> List.flatten()
 
     {:ok, [data_size]} =
       Wasmex.call_function(
         bridge.instance,
         function,
-        [bridge.index, args |> byte_size()]
+        func_arg
       )
 
     bridge

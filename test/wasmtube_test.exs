@@ -29,7 +29,7 @@ defmodule Wasmtube.Test do
       Wasmtube.from_file(@wasm_file)
       |> Wasmtube.call_function(
         "echo",
-        struct: %{
+        data: %{
           args: "Hello World!"
         }
       )

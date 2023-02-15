@@ -4,8 +4,8 @@ defmodule Wasmtube.Bridge.Test do
 
   @wasm_file "test/wasm_test/target/wasm32-unknown-unknown/release/wasm_test.wasm"
   # This image is taken from:
-  # https://commons.wikimedia.org/wiki/File:So_happy_smiling_cat.jpg
-  @image_file "test/assets/cat.jpg"
+  # https://github.com/dmlc/mxnet.js/blob/main/data/cat.png
+  @image_file "test/assets/cat.png"
 
   test "new/1 with binary" do
     bridge = Wasmtube.Bridge.new(binary: File.read!(@wasm_file))
@@ -17,14 +17,14 @@ defmodule Wasmtube.Bridge.Test do
     assert %Wasmtube.Bridge{} = bridge
   end
 
-  test "call_function/3 with struct" do
+  test "call_function/3 with data" do
     bridge = Wasmtube.Bridge.new(file: @wasm_file)
 
     result =
       bridge
       |> Wasmtube.Bridge.call_function(
         "echo",
-        struct: %{
+        data: %{
           args: "Hello World!"
         }
       )
@@ -34,19 +34,21 @@ defmodule Wasmtube.Bridge.Test do
            }
   end
 
-  test "call_function/3 with binary" do
+  test "call_function/3 with image" do
     bridge = Wasmtube.Bridge.new(file: @wasm_file)
 
     result =
       bridge
       |> Wasmtube.Bridge.call_function(
         "image_size",
-        binary: File.read!(@image_file)
+        image: File.read!(@image_file),
+        width: 256,
+        height: 256
       )
 
     assert result == %{
-             "width" => 429,
-             "height" => 500
+             "width" => 256,
+             "height" => 256
            }
   end
 
