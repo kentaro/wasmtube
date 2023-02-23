@@ -13,13 +13,22 @@ defmodule Wasmtube.FileWatcher do
     watcher_name = Keyword.get(args, :watcher_name, :"#{__MODULE__}.Watcher")
     worker_pid = Keyword.get(args, :worker_pid)
 
+    extra_arg =
+      case :os.type do
+        {:unix, :darwin} -> [
+          latency: 0,
+          no_defer: true
+        ]
+        _ -> []
+      end
+
     {:ok, watcher_pid} =
       FileSystem.start_link(
+        Keyword.merge([
         dirs: dirs,
         name: watcher_name,
-        latency: 0,
-        no_defer: true
-      )
+      ], extra_arg)
+    )
 
     FileSystem.subscribe(watcher_pid)
 

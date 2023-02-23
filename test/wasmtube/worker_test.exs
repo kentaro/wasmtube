@@ -43,9 +43,9 @@ defmodule Wasmtube.Worker.Test do
     worker_pid = start_worker(Wasmtube.Worker.Test.Reload)
     started = GenServer.call(worker_pid, :started)
 
-    :timer.sleep(100)
+    :timer.sleep(1000)
     File.touch(@wasm_file)
-    :timer.sleep(100)
+    :timer.sleep(1000)
 
     reloaded = GenServer.call(worker_pid, :started)
 
