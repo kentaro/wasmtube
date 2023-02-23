@@ -8,8 +8,8 @@ defmodule Wasmtube.Worker.Test do
   def start_worker(name) do
     {:ok, worker_pid} =
       Wasmtube.Worker.start_link(
-        dirs: [@watch_dir],
-        wasm_file: @wasm_file,
+        dirs: [Path.absname(@watch_dir)],
+        wasm_file: Path.absname(@wasm_file),
         name: name
       )
 
@@ -21,7 +21,7 @@ defmodule Wasmtube.Worker.Test do
     assert is_pid(worker_pid)
   end
 
-  test "call_function" do
+  test "handle_call(:call_function)" do
     worker_pid = start_worker(Wasmtube.Worker.Test.CallFunction)
 
     result =
@@ -37,5 +37,18 @@ defmodule Wasmtube.Worker.Test do
     assert result == %{
              "args" => "Hello World!"
            }
+  end
+
+  test "handle_cast(:reload)" do
+    worker_pid = start_worker(Wasmtube.Worker.Test.Reload)
+    started = GenServer.call(worker_pid, :started)
+
+    :timer.sleep(100)
+    File.touch(@wasm_file)
+    :timer.sleep(100)
+
+    reloaded = GenServer.call(worker_pid, :started)
+
+    assert Time.compare(reloaded, started) == :gt
   end
 end

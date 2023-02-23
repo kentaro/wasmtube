@@ -11,12 +11,14 @@ defmodule Wasmtube.FileWatcher do
     dirs = Keyword.get(args, :dirs, [])
     wasm_file = Keyword.get(args, :wasm_file)
     watcher_name = Keyword.get(args, :watcher_name, :"#{__MODULE__}.Watcher")
-    worker = Keyword.get(args, :worker, Wasmtube.Worker)
+    worker_pid = Keyword.get(args, :worker_pid)
 
     {:ok, watcher_pid} =
       FileSystem.start_link(
         dirs: dirs,
-        name: watcher_name
+        name: watcher_name,
+        latency: 0,
+        no_defer: true
       )
 
     FileSystem.subscribe(watcher_pid)
@@ -24,16 +26,16 @@ defmodule Wasmtube.FileWatcher do
     {:ok,
      %{
        wasm_file: wasm_file,
-       worker: worker,
-       watcher_pid: watcher_pid,
+       worker_pid: worker_pid,
+       watcher_pid: watcher_pid
      }}
   end
 
   @impl GenServer
   def handle_info({:file_event, _watcher_pid, {path, events}}, state) do
     if path == state.wasm_file do
-      if :created in events or :modified in events do
-        GenServer.cast(state.worker, {:reload, path})
+      if :created in events or :modified in events or :inodemetamod in events do
+        GenServer.cast(state.worker_pid, {:reload, path})
       end
     end
 

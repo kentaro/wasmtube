@@ -17,7 +17,7 @@ defmodule Wasmtube.Worker do
       FileWatcher.start_link(
         dirs: dirs,
         wasm_file: wasm_file,
-        worker: __MODULE__
+        worker_pid: self()
       )
 
     wasm_bridge = load_wasm(wasm_file)
@@ -41,7 +41,7 @@ defmodule Wasmtube.Worker do
       state.wasm_bridge
       |> Wasmtube.Bridge.call_function(function, arg)
 
-      {:reply, result, state}
+    {:reply, result, state}
   end
 
   @impl GenServer

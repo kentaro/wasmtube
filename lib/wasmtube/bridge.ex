@@ -17,7 +17,7 @@ defmodule Wasmtube.Bridge do
       instance: instance,
       store: store,
       memory: memory,
-      index: @default_index,
+      index: @default_index
     }
   end
 
@@ -26,11 +26,12 @@ defmodule Wasmtube.Bridge do
     new(binary: wasm_binary)
   end
 
-  def call_function(bridge, function, [image: image, width: width, height: height]) when is_binary(image) do
+  def call_function(bridge, function, image: image, width: width, height: height)
+      when is_binary(image) do
     bridge |> call_function(function, image, [width, height])
   end
 
-  def call_function(bridge, function, [data: data]) do
+  def call_function(bridge, function, data: data) do
     json = data |> Jason.encode!()
     bridge |> call_function(function, json, [])
   end
@@ -38,12 +39,13 @@ defmodule Wasmtube.Bridge do
   def call_function(bridge, function, data, args) do
     bridge |> write_binary(data)
 
-    func_arg = [
-      bridge.index,
-      data |> byte_size(),
-      args
-    ]
-    |> List.flatten()
+    func_arg =
+      [
+        bridge.index,
+        data |> byte_size(),
+        args
+      ]
+      |> List.flatten()
 
     {:ok, [data_size]} =
       Wasmex.call_function(
