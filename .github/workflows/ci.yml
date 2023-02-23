@@ -11,6 +11,9 @@ jobs:
         elixir: ['1.14.2']
     runs-on: ubuntu-latest
     steps:
+      - name: Install dependencies
+        run: sudo apt-get install -y inotify-tools
+
       - uses: actions/checkout@v2
 
       # build Rust project for test
