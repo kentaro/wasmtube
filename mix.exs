@@ -22,7 +22,8 @@ defmodule Wasmtube.MixProject do
   defp deps do
     [
       {:wasmex, "~> 0.8.2"},
-      {:jason, "~> 1.4"}
+      {:jason, "~> 1.4"},
+      {:file_system, "~> 0.2.10"}
     ]
   end
 end

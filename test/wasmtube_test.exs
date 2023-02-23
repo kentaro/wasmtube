@@ -28,7 +28,7 @@ defmodule Wasmtube.Test do
     result =
       Wasmtube.from_file(@wasm_file)
       |> Wasmtube.call_function(
-        "echo",
+        :echo,
         data: %{
           args: "Hello World!"
         }

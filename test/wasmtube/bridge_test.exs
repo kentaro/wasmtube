@@ -1,6 +1,6 @@
 defmodule Wasmtube.Bridge.Test do
   use ExUnit.Case, async: true
-  doctest Wasmtube
+  doctest Wasmtube.Bridge
 
   @wasm_file "test/wasm_test/target/wasm32-unknown-unknown/release/wasm_test.wasm"
   # This image is taken from:
@@ -23,7 +23,7 @@ defmodule Wasmtube.Bridge.Test do
     result =
       bridge
       |> Wasmtube.Bridge.call_function(
-        "echo",
+        :echo,
         data: %{
           args: "Hello World!"
         }
@@ -40,7 +40,7 @@ defmodule Wasmtube.Bridge.Test do
     result =
       bridge
       |> Wasmtube.Bridge.call_function(
-        "image_size",
+        :image_size,
         image: File.read!(@image_file),
         width: 256,
         height: 256
