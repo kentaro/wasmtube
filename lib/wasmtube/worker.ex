@@ -26,13 +26,19 @@ defmodule Wasmtube.Worker do
      %{
        wasm_bridge: wasm_bridge,
        watcher_pid: watcher_pid,
-       started: Time.utc_now()
+       started: Time.utc_now(),
+       version: 0
      }}
   end
 
   @impl GenServer
   def handle_call(:started, _from, state) do
     {:reply, state.started, state}
+  end
+
+  @impl GenServer
+  def handle_call(:version, _from, state) do
+    {:reply, state.version, state}
   end
 
   @impl GenServer
@@ -52,7 +58,8 @@ defmodule Wasmtube.Worker do
      %{
        state
        | wasm_bridge: wasm_bridge,
-         started: Time.utc_now()
+         started: Time.utc_now(),
+         version: state.version + 1
      }}
   end
 

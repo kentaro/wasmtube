@@ -41,14 +41,13 @@ defmodule Wasmtube.Worker.Test do
 
   test "handle_cast(:reload)" do
     worker_pid = start_worker(Wasmtube.Worker.Test.Reload)
-    started = GenServer.call(worker_pid, :started)
+    old_version = GenServer.call(worker_pid, :version)
 
-    :timer.sleep(1000)
     File.touch(@wasm_file)
-    :timer.sleep(1000)
+    :timer.sleep(100)
 
-    reloaded = GenServer.call(worker_pid, :started)
+    current_version = GenServer.call(worker_pid, :version)
 
-    assert Time.compare(reloaded, started) == :gt
+    assert current_version > old_version
   end
 end
