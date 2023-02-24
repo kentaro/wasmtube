@@ -49,7 +49,8 @@ defmodule Wasmtube.FileWatcher do
   @impl GenServer
   def handle_info({:file_event, _watcher_pid, {path, events}}, state) do
     if path == state.wasm_file do
-      if :created in events or :modified in events or :inodemetamod in events or :attribute in events do
+      if :created in events or :modified in events or :inodemetamod in events or
+           :attribute in events do
         GenServer.cast(state.worker_pid, {:reload, path})
       end
     end
