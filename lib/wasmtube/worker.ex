@@ -31,6 +31,14 @@ defmodule Wasmtube.Worker do
      }}
   end
 
+  def call_function(worker_pid, function, arg) do
+    worker_pid |> GenServer.call({:call_function, function, arg})
+  end
+
+  def version(worker_pid) do
+    GenServer.call(worker_pid, :version)
+  end
+
   @impl GenServer
   def handle_call(:started, _from, state) do
     {:reply, state.started, state}

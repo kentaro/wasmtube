@@ -21,6 +21,29 @@ defmodule Wasmtube.Worker.Test do
     assert is_pid(worker_pid)
   end
 
+  test "call_function/3" do
+    worker_pid = start_worker(Wasmtube.Worker.Test.CallFunction)
+
+    result =
+      worker_pid
+      |> Wasmtube.Worker.call_function(:echo,
+        data: %{
+          args: "Hello World!"
+        }
+      )
+
+    assert result == %{
+             "args" => "Hello World!"
+           }
+  end
+
+  test "version/0" do
+    worker_pid = start_worker(Wasmtube.Worker.Test.Version)
+    version = worker_pid |> Wasmtube.Worker.version()
+
+    assert version == 0
+  end
+
   test "handle_call(:call_function)" do
     worker_pid = start_worker(Wasmtube.Worker.Test.CallFunction)
 
@@ -41,12 +64,12 @@ defmodule Wasmtube.Worker.Test do
 
   test "handle_cast(:reload)" do
     worker_pid = start_worker(Wasmtube.Worker.Test.Reload)
-    old_version = GenServer.call(worker_pid, :version)
+    old_version = worker_pid |> Wasmtube.Worker.version()
 
     File.touch(@wasm_file)
     :timer.sleep(100)
 
-    current_version = GenServer.call(worker_pid, :version)
+    current_version = worker_pid |> Wasmtube.Worker.version()
 
     assert current_version > old_version
   end
