@@ -18,7 +18,7 @@ end
 
 ### Use `Wasmtube` directly
 
-`Wasmtube` provides simple APIs to instantiate Wasm sandbox specialized for a Wasm binary to which functions are called.
+`Wasmtube` provides simple APIs to instantiate Wasm sandbox individualized for a Wasm binary to which functions are called.
 
 ```elixir
 Wasmtube.from_file("hello_world.wasm")
@@ -61,7 +61,7 @@ sequenceDiagram
 
   Elixir App ->> Wasmtube: starts Wasmtube with <br> Wasm binary
   Wasmtube ->> Wasm Sandbox: instantiates the Wasm Sandbox <br> with the Wasm binary
-  Wasm Sandbox ->> Linear Memory: prepare specialized memory <br> for the Wasm module
+  Wasm Sandbox ->> Linear Memory: prepare individualized <br> memory for <br> the Wasm module
   Wasm Sandbox -->> Wasmtube: finish init process
   Wasmtube -->> Elixir App: returns the instance <br> of `Wasm.Bridge`
 ```
@@ -104,10 +104,10 @@ sequenceDiagram
   end
 
   Deployer ->> OS: deploys a new <br> Wasm binary
-  OS ->> Wasmtube: notify the <br> file updated
-  Wasmtube ->> OS: re-read the file
-  Wasmtube ->> Wasm Sandbox: re-instantiate <br> the sandbox <br> with the new binary
-  Wasm Sandbox ->> Wasmtube: finish init process
+  OS ->> Wasmtube: notifies the <br> file updated
+  Wasmtube ->> OS: re-reads the file
+  Wasmtube ->> Wasm Sandbox: re-instantiates <br> the sandbox <br> with the new binary
+  Wasm Sandbox ->> Wasmtube: finishes init process
 ```
 
 ## How to implement Wasm functions
