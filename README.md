@@ -1,6 +1,6 @@
 # Wasmtube
 
-Wasmtube is a bridging library that allows you to communicate between Elixir and Wasm. It supports images and structured values as arguments to be passed into Wasm functions.
+Wasmtube is a bridging library that allows you to communicate between Elixir and Wasm. It supports  structured values and images as arguments to be passed into Wasm functions.
 
 ## Installation
 
@@ -43,6 +43,135 @@ worker_pid
     arg: "World"
   })
 ```
+
+## How `Wasmtube` works
+
+Here's an illustration to help you intuitively understand how `Wasmtube` works.
+
+### Initialization process
+
+```mermaid
+sequenceDiagram
+  autonumber
+
+  participant Elixir App
+  participant Wasmtube
+  participant Lenear Memory
+  participant Wasm Sandbox
+
+  Elixir App ->> Wasmtube: starts Wasmtube with <br> Wasm binary
+  Wasmtube ->> Wasm Sandbox: instantiates the Wasm Sandbox <br> related to the Wasm binary
+  Wasm Sandbox ->> Lenear Memory: prepare specialized memory <br> for the Wasm module
+  Wasm Sandbox -->> Wasmtube: finish init process
+  Wasmtube -->> Elixir App: returns the instance <br> of `Wasm.Bridge`
+```
+
+### Calling Wasm functions
+
+```mermaid
+sequenceDiagram
+  autonumber
+
+  participant Elixir App
+  participant Wasmtube
+  participant Lenear Memory
+  participant Wasm Sandbox
+
+  Elixir App ->> Wasmtube: calls a function
+  Wasmtube ->> Lenear Memory: writes the data
+  Wasmtube ->> Wasm Sandbox: delegates the function
+  Wasm Sandbox ->> Lenear Memory: reads the data
+  Wasm Sandbox ->> Wasm Sandbox: process the data
+  Wasm Sandbox ->> Lenear Memory: writes the data
+  Wasm Sandbox -->> Wasmtube: responds to the function
+  Wasmtube ->> Lenear Memory: reads the data
+  Wasmtube -->> Elixir App: delegate the response
+```
+
+## How to implement Wasm functions
+
+To get to know how to implement Wasm functions to be used with `Wasmtube`, see [wasm_test](./test/wasm_test) for details.
+
+### Structure values
+
+`Wasmtube` writes and reads structured values by which it interacts with Wasm runtime into [lenear memory](https://docs.wasmtime.dev/contributing-architecture.html#linear-memory). You are supposed to read and write the data processed in Wasm function as JSON-encoded values.
+
+Example implementation for above explanation looks like below:
+
+```rust
+#[no_mangle]
+pub unsafe extern "C" fn echo(index: *const u8, length: usize) -> i32 {
+    let slice = unsafe { slice::from_raw_parts(index, length) };
+    let args: Args = serde_json::from_str::<Args>(str::from_utf8(slice).unwrap()).unwrap();
+
+    store_into_memory(index, args)
+}
+```
+
+See [wasm_test/src/lib.rs](./test/wasm_test/src/lib.rs) for details.
+
+Call the function implemented above as below:
+
+```elixir
+Wasmtube.from_file("/path/to/wasm")
+  |> Wasmtube.call_function(
+    :echo,
+    data: %{
+      args: "Hello World!"
+    }
+  )
+```
+
+### Images
+
+`Wasmtube` writes and reads images by which it interacts with Wasm runtime into [lenear memory](https://docs.wasmtime.dev/contributing-architecture.html#linear-memory). You are supposed to read and write the data processed in Wasm function as binary-encoded values.
+
+Example implementation for above explanation looks like below:
+
+```rust
+#[no_mangle]
+pub unsafe extern "C" fn image_size(
+    index: *const u8,
+    _length: usize,
+    width: u32,
+    height: u32,
+) -> i32 {
+    let slice = unsafe { slice::from_raw_parts(index, (width * height * 3) as usize) };
+    let img = image::RgbImage::from_raw(width, height, slice.to_vec()).unwrap();
+
+    let image_info = ImageInfo {
+        width: img.width(),
+        height: img.height(),
+    };
+
+    store_into_memory(index, image_info)
+}
+```
+
+See [wasm_test/src/lib.rs](./test/wasm_test/src/lib.rs) for details.
+
+Call the function implemented above as below:
+
+```elixir
+Wasmtube.from_file("/path/to/wasm")
+  |> Wasmtube.call_function(
+    :image_size,
+    image: File.read!("/path/to/image"),
+      width: 256,
+      height: 256
+  )
+```
+
+### Build it
+
+You can build it as below:
+
+```sh
+cd test/wasm_test
+wasm-pack build
+```
+
+You'll see a Wasm file at `test/wasm_test/target/wasm32-unknown-unknown/release/wasm_test.wasm`.
 
 ## Author
 

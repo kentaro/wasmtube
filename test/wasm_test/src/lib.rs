@@ -24,7 +24,12 @@ pub unsafe extern "C" fn echo(index: *const u8, length: usize) -> i32 {
 
 /// # Safety
 #[no_mangle]
-pub unsafe extern "C" fn image_size(index: *const u8, _length: usize, width: u32, height: u32) -> i32 {
+pub unsafe extern "C" fn image_size(
+    index: *const u8,
+    _length: usize,
+    width: u32,
+    height: u32,
+) -> i32 {
     let slice = unsafe { slice::from_raw_parts(index, (width * height * 3) as usize) };
     let img = image::RgbImage::from_raw(width, height, slice.to_vec()).unwrap();
 
