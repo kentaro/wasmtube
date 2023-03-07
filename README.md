@@ -1,11 +1,10 @@
 # Wasmtube
 
-Wasmtube is a bridging library that allows you to communicate between Elixir and Wasm via JSON-encoded structured values.
+Wasmtube is a bridging library that allows you to communicate between Elixir and Wasm. It supports images and structured values as arguments to be passed into Wasm functions.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `wasmtube` to your list of dependencies in `mix.exs`:
+If [available in Hex](https://hex.pm/docs/publish), the package can be installed by adding `wasmtube` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -17,18 +16,34 @@ end
 
 ## Usage
 
+### Use `Wasmtube` directly
+
+`Wasmtube` provides simple APIs to instantiate Wasm runtime with a Wasm binary and call functions to it.
+
 ```elixir
 Wasmtube.from_file("hello_world.wasm")
-|> Wasmtube.call_function("hello", %{arg: "World"})
+|> Wasmtube.call_function(:hello, data: %{
+  arg: "World"
+})
 ```
 
-`Wasmtube.call_function` takes 2 arguments:
+### Use `Wasmtube.Worker` to be supervised
 
-- Function name that is same as one in Wasm code.
-- Arguments that are represented by `Map` in Elixir
+`Wasmtube.Worker` is useful when you want to put the Wasm runtime under supervision tree.
 
-When you call a function defined in Wasm from Elixir, arguments passed into the function and values returned from it are conveyed via `WebAssembly.Memory`.
+```elixir
+{:ok, worker_pid} =
+  Wasmtube.Worker.start_link(
+    wasm_file: "hello_world.wasm",
+    name: name
+  )
+
+worker_pid
+  |> Wasmtube.Worker.call_function(:echo, data: %{
+    arg: "World"
+  })
+```
 
 ## Author
 
-Kentaro Kuribayashi
+Kentaro Kuribayashi <kentarok@gmail.com>

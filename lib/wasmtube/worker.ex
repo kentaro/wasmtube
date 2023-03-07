@@ -10,8 +10,10 @@ defmodule Wasmtube.Worker do
 
   @impl GenServer
   def init(args) do
-    dirs = Keyword.get(args, :dirs, [])
-    wasm_file = Keyword.get(args, :wasm_file)
+    wasm_file =
+      Keyword.get(args, :wasm_file)
+      |> Path.absname()
+    dirs = [Path.dirname(wasm_file)]
 
     {:ok, watcher_pid} =
       FileWatcher.start_link(

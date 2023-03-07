@@ -2,14 +2,12 @@ defmodule Wasmtube.Worker.Test do
   use ExUnit.Case, async: true
   doctest Wasmtube.Worker
 
-  @watch_dir "test/wasm_test/target/wasm32-unknown-unknown/release"
   @wasm_file "test/wasm_test/target/wasm32-unknown-unknown/release/wasm_test.wasm"
 
   def start_worker(name) do
     {:ok, worker_pid} =
       Wasmtube.Worker.start_link(
-        dirs: [Path.absname(@watch_dir)],
-        wasm_file: Path.absname(@wasm_file),
+        wasm_file: @wasm_file,
         name: name
       )
 
