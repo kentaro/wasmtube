@@ -43,7 +43,7 @@ defmodule Wasmtube.Worker.Test do
   end
 
   test "handle_call(:call_function)" do
-    worker_pid = start_worker(Wasmtube.Worker.Test.CallFunction)
+    worker_pid = start_worker(Wasmtube.Worker.Test.HandleCall.CallFunction)
 
     result =
       worker_pid
