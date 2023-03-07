@@ -1,6 +1,6 @@
 # Wasmtube
 
-Wasmtube is a bridging library that allows you to communicate between Elixir and Wasm. It supports  structured values and images as arguments to be passed into Wasm functions.
+Wasmtube is a bridging library which allows you to communicate between Elixir and Wasm. It supports  structured values and images as arguments to be passed into Wasm functions.
 
 ## Installation
 
@@ -18,7 +18,7 @@ end
 
 ### Use `Wasmtube` directly
 
-`Wasmtube` provides simple APIs to instantiate Wasm runtime with a Wasm binary and call functions to it.
+`Wasmtube` provides simple APIs to instantiate Wasm sandbox specialized for a Wasm binary to which functions are called.
 
 ```elixir
 Wasmtube.from_file("hello_world.wasm")
@@ -29,7 +29,7 @@ Wasmtube.from_file("hello_world.wasm")
 
 ### Use `Wasmtube.Worker` to be supervised
 
-`Wasmtube.Worker` is useful when you want to put the Wasm runtime under supervision tree.
+`Wasmtube.Worker` is useful when you want to put the `Wasmtube` under supervision tree.
 
 ```elixir
 {:ok, worker_pid} =
@@ -56,12 +56,12 @@ sequenceDiagram
 
   participant Elixir App
   participant Wasmtube
-  participant Lenear Memory
+  participant Linear Memory
   participant Wasm Sandbox
 
   Elixir App ->> Wasmtube: starts Wasmtube with <br> Wasm binary
-  Wasmtube ->> Wasm Sandbox: instantiates the Wasm Sandbox <br> related to the Wasm binary
-  Wasm Sandbox ->> Lenear Memory: prepare specialized memory <br> for the Wasm module
+  Wasmtube ->> Wasm Sandbox: instantiates the Wasm Sandbox <br> with the Wasm binary
+  Wasm Sandbox ->> Linear Memory: prepare specialized memory <br> for the Wasm module
   Wasm Sandbox -->> Wasmtube: finish init process
   Wasmtube -->> Elixir App: returns the instance <br> of `Wasm.Bridge`
 ```
@@ -74,27 +74,49 @@ sequenceDiagram
 
   participant Elixir App
   participant Wasmtube
-  participant Lenear Memory
+  participant Linear Memory
   participant Wasm Sandbox
 
   Elixir App ->> Wasmtube: calls a function
-  Wasmtube ->> Lenear Memory: writes the data
+  Wasmtube ->> Linear Memory: writes the data
   Wasmtube ->> Wasm Sandbox: delegates the function
-  Wasm Sandbox ->> Lenear Memory: reads the data
+  Wasm Sandbox ->> Linear Memory: reads the data
   Wasm Sandbox ->> Wasm Sandbox: process the data
-  Wasm Sandbox ->> Lenear Memory: writes the data
+  Wasm Sandbox ->> Linear Memory: writes the data
   Wasm Sandbox -->> Wasmtube: responds to the function
-  Wasmtube ->> Lenear Memory: reads the data
+  Wasmtube ->> Linear Memory: reads the data
   Wasmtube -->> Elixir App: delegate the response
+```
+
+### Update the Wasm functions
+
+`Wasmtube` can handle updates of Wasm binary. It allows you to update the functions on the fly.
+
+```mermaid
+sequenceDiagram
+  autonumber
+
+  participant Deployer
+  box White Host
+    participant OS
+    participant Wasmtube
+    participant Wasm Sandbox
+  end
+
+  Deployer ->> OS: deploys a new <br> Wasm binary
+  OS ->> Wasmtube: notify the <br> file updated
+  Wasmtube ->> OS: re-read the file
+  Wasmtube ->> Wasm Sandbox: re-instantiate <br> the sandbox <br> with the new binary
+  Wasm Sandbox ->> Wasmtube: finish init process
 ```
 
 ## How to implement Wasm functions
 
 To get to know how to implement Wasm functions to be used with `Wasmtube`, see [wasm_test](./test/wasm_test) for details.
 
-### Structure values
+### Structured values
 
-`Wasmtube` writes and reads structured values by which it interacts with Wasm runtime into [lenear memory](https://docs.wasmtime.dev/contributing-architecture.html#linear-memory). You are supposed to read and write the data processed in Wasm function as JSON-encoded values.
+`Wasmtube` writes and reads structured values by which it interacts with Wasm sandbox into [Linear memory](https://docs.wasmtime.dev/contributing-architecture.html#linear-memory). You are supposed to read and write the data processed in Wasm function as JSON-encoded values.
 
 Example implementation for above explanation looks like below:
 
@@ -124,7 +146,7 @@ Wasmtube.from_file("/path/to/wasm")
 
 ### Images
 
-`Wasmtube` writes and reads images by which it interacts with Wasm runtime into [lenear memory](https://docs.wasmtime.dev/contributing-architecture.html#linear-memory). You are supposed to read and write the data processed in Wasm function as binary-encoded values.
+`Wasmtube` writes and reads images by which it interacts with Wasm sandbox into [Linear memory](https://docs.wasmtime.dev/contributing-architecture.html#linear-memory). You are supposed to read and write the data processed in Wasm function as binary-encoded values.
 
 Example implementation for above explanation looks like below:
 
@@ -164,7 +186,7 @@ Wasmtube.from_file("/path/to/wasm")
 
 ### Build it
 
-You can build it as below:
+You can build it using [wasm-pack](https://rustwasm.github.io/wasm-pack/) as below:
 
 ```sh
 cd test/wasm_test
