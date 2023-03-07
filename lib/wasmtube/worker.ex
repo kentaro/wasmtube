@@ -19,7 +19,8 @@ defmodule Wasmtube.Worker do
       FileWatcher.start_link(
         dirs: dirs,
         wasm_file: wasm_file,
-        worker_pid: self()
+        worker_pid: self(),
+        watcher_name: :"#{__MODULE__}.Watcher"
       )
 
     wasm_bridge = load_wasm(wasm_file)
