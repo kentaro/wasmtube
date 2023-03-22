@@ -8,17 +8,17 @@ defmodule Wasmtube.Bridge.Test do
   @image_file "test/assets/cat.png"
 
   test "new/1 with binary" do
-    bridge = Wasmtube.Bridge.new(binary: File.read!(@wasm_file))
+    bridge = Wasmtube.Bridge.new(binary: File.read!(@wasm_file), lock_name: Wasmtube.Bridge.Test.New.Binary)
     assert %Wasmtube.Bridge{} = bridge
   end
 
   test "new/1 with file" do
-    bridge = Wasmtube.Bridge.new(file: @wasm_file)
+    bridge = Wasmtube.Bridge.new(file: @wasm_file, lock_name: Wasmtube.Bridge.Test.New.File)
     assert %Wasmtube.Bridge{} = bridge
   end
 
   test "call_function/3 with data" do
-    bridge = Wasmtube.Bridge.new(file: @wasm_file)
+    bridge = Wasmtube.Bridge.new(file: @wasm_file, lock_name: Wasmtube.Bridge.Test.CallFunction.Data)
 
     result =
       bridge
@@ -35,7 +35,7 @@ defmodule Wasmtube.Bridge.Test do
   end
 
   test "call_function/3 with image" do
-    bridge = Wasmtube.Bridge.new(file: @wasm_file)
+    bridge = Wasmtube.Bridge.new(file: @wasm_file, lock_name: Wasmtube.Bridge.Test.CallFunction.Image)
 
     result =
       bridge
@@ -53,7 +53,7 @@ defmodule Wasmtube.Bridge.Test do
   end
 
   test "write_binary/2" do
-    bridge = Wasmtube.Bridge.new(file: @wasm_file)
+    bridge = Wasmtube.Bridge.new(file: @wasm_file, lock_name: Wasmtube.Bridge.Test.WriteBinary)
 
     bridge
     |> Wasmtube.Bridge.write_binary("Hello World!")
@@ -70,7 +70,7 @@ defmodule Wasmtube.Bridge.Test do
   end
 
   test "read_binary/2" do
-    bridge = Wasmtube.Bridge.new(file: @wasm_file)
+    bridge = Wasmtube.Bridge.new(file: @wasm_file, lock_name: Wasmtube.Bridge.Test.ReadBinary)
 
     bridge
     |> Wasmtube.Bridge.write_binary("Hello World!")

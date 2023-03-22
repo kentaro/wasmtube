@@ -9,6 +9,11 @@ defmodule Wasmtube.Test do
     assert %Wasmtube.Bridge{} = bridge
   end
 
+  test "from_file/1" do
+    bridge = Wasmtube.from_file(@wasm_file)
+    assert %Wasmtube.Bridge{} = bridge
+  end
+
   test "from_file/2" do
     bridge = Wasmtube.from_file(@wasm_file, Wasmtube.Test.FromFile)
     assert %Wasmtube.Bridge{} = bridge

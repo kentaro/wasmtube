@@ -32,7 +32,8 @@ defmodule Wasmtube.Bridge do
   end
 
   def new(file: wasm_file) do
-    new(file: wasm_file, lock_name: @default_lock_name)
+    lock_name = wasm_file |> Path.basename()
+    new(file: wasm_file, lock_name: lock_name)
   end
 
   def new(file: wasm_file, lock_name: lock_name) do
