@@ -5,12 +5,12 @@ defmodule Wasmtube.Test do
   @wasm_file "test/wasm_test/target/wasm32-unknown-unknown/release/wasm_test.wasm"
 
   test "from_binary/2" do
-    bridge = Wasmtube.from_binary(File.read!(@wasm_file))
+    bridge = Wasmtube.from_binary(File.read!(@wasm_file), Wasmtube.Test.FromBinary)
     assert %Wasmtube.Bridge{} = bridge
   end
 
-  test "from_fire/2" do
-    bridge = Wasmtube.from_file(@wasm_file)
+  test "from_file/2" do
+    bridge = Wasmtube.from_file(@wasm_file, Wasmtube.Test.FromFile)
     assert %Wasmtube.Bridge{} = bridge
   end
 
@@ -18,7 +18,7 @@ defmodule Wasmtube.Test do
     index = 256
 
     bridge =
-      Wasmtube.from_file(@wasm_file)
+      Wasmtube.from_file(@wasm_file, Wasmtube.Test.Index)
       |> Wasmtube.index(index)
 
     assert bridge.index == index
@@ -26,7 +26,7 @@ defmodule Wasmtube.Test do
 
   test "call_function/3" do
     result =
-      Wasmtube.from_file(@wasm_file)
+      Wasmtube.from_file(@wasm_file, Wasmtube.Test.CallFunction)
       |> Wasmtube.call_function(
         :echo,
         data: %{
