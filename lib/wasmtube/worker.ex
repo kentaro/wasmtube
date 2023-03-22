@@ -13,6 +13,7 @@ defmodule Wasmtube.Worker do
     wasm_file =
       Keyword.get(args, :wasm_file)
       |> Path.absname()
+
     dirs = [Path.dirname(wasm_file)]
 
     {:ok, watcher_pid} =
@@ -23,14 +24,16 @@ defmodule Wasmtube.Worker do
         watcher_name: :"#{__MODULE__}.Watcher"
       )
 
-    wasm_bridge = load_wasm(wasm_file)
+    lock_name = Keyword.get(args, :lock_name, "#{__MODULE__}_lock")
+    wasm_bridge = load_wasm(wasm_file, lock_name)
 
     {:ok,
      %{
        wasm_bridge: wasm_bridge,
        watcher_pid: watcher_pid,
        started: Time.utc_now(),
-       version: 0
+       version: 0,
+       lock_name: lock_name
      }}
   end
 
@@ -63,18 +66,23 @@ defmodule Wasmtube.Worker do
 
   @impl GenServer
   def handle_cast({:reload, path}, state) do
-    wasm_bridge = load_wasm(path)
+    started = Time.utc_now()
+    version = state.version + 1
+    lock_name = "#{state.lock_name}_#{started}_#{version}"
+
+    wasm_bridge = load_wasm(path, lock_name)
 
     {:noreply,
      %{
        state
        | wasm_bridge: wasm_bridge,
-         started: Time.utc_now(),
-         version: state.version + 1
+         started: started,
+         version: version,
+         lock_name: lock_name
      }}
   end
 
-  defp load_wasm(path) do
-    Wasmtube.from_file(path)
+  defp load_wasm(path, lock_name) do
+    Wasmtube.from_file(path, lock_name)
   end
 end

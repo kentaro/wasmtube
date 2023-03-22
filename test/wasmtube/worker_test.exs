@@ -8,7 +8,8 @@ defmodule Wasmtube.Worker.Test do
     {:ok, worker_pid} =
       Wasmtube.Worker.start_link(
         wasm_file: @wasm_file,
-        name: name
+        name: name,
+        lock_name: "#{name}_lock"
       )
 
     worker_pid

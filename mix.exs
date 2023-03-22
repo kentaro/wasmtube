@@ -23,7 +23,8 @@ defmodule Wasmtube.MixProject do
     [
       {:wasmex, "~> 0.8.2"},
       {:jason, "~> 1.4"},
-      {:file_system, "~> 0.2.10"}
+      {:file_system, "~> 0.2.10"},
+      {:sleeplocks, "~> 1.1.1"}
     ]
   end
 end
