@@ -16,12 +16,13 @@ defmodule Wasmtube.Worker do
 
     dirs = [Path.dirname(wasm_file)]
 
+    name = Keyword.get(args, :name, __MODULE__)
     {:ok, watcher_pid} =
       FileWatcher.start_link(
         dirs: dirs,
         wasm_file: wasm_file,
         worker_pid: self(),
-        watcher_name: :"#{__MODULE__}.Watcher"
+        watcher_name: :"#{name}.Watcher"
       )
 
     lock_name = Keyword.get(args, :lock_name, "#{__MODULE__}_lock")

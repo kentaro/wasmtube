@@ -4,7 +4,7 @@ defmodule Wasmtube.Test do
 
   @wasm_file "test/wasm_test/target/wasm32-unknown-unknown/release/wasm_test.wasm"
 
-  test "from_binary/1" do
+  test "from_binary/2" do
     bridge = Wasmtube.from_binary(File.read!(@wasm_file), Wasmtube.Test.FromBinary)
     assert %Wasmtube.Bridge{} = bridge
   end
