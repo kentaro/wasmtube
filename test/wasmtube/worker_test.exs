@@ -66,7 +66,7 @@ defmodule Wasmtube.Worker.Test do
     old_version = worker_pid |> Wasmtube.Worker.version()
 
     File.touch(@wasm_file)
-    :timer.sleep(100)
+    :timer.sleep(500)
 
     current_version = worker_pid |> Wasmtube.Worker.version()
 
