@@ -21,7 +21,7 @@ defmodule Wasmtube.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:wasmex, "~> 0.8.2"},
+      {:wasmex, "0.8.2"},
       {:jason, "~> 1.4"},
       {:file_system, "~> 0.2.10"},
       {:sleeplocks, "~> 1.1.1"}
